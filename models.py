@@ -1,8 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import  validates
 
 
 db = SQLAlchemy()
 
+#Association Table for many to many relationship between users and groups
+user_groups = db.Table('user_groups',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'), primary_key=True)
+)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -11,9 +17,48 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
 
+    posts = db.relationship("Post", back_populates="user")
+    # comments = db.relationship("Comment", back_populates="user")
+
+    @validates("email")
+    def validate_email(self, key, email):
+        if "@" not in email:
+            raise ValueError("'@' must be a valid email address")
+        return email
+    @validates("email")
+    def validate_email_dot(self, key, email):
+        if "." not in email:
+            raise ValueError("'.' must be a valid email address")
+        return email
+
+
 class Post(db.Model):
     __tablename__ = "posts"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
     description = db.Column(db.String(200))
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+    user = db.relationship("User", back_populates="posts")
+    # comments = db.relationship("Comment", back_populates="post")
+
+class Group(db.Model):
+    __tablename__ = "groups"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+
+
+
+# class Comment(db.Model):
+#     __tablename__ = "comments"
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     title = db.Column(db.String(255))
+
+#     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+
+#     post = db.relationship("User", back_populates="comments")
+#     user = db.relationship("Post", back_populates="comments")
