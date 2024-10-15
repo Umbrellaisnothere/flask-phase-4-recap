@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from models import db
+from flask_sqlalchemy import SQLAlchemy
 
 # Flask is a lightweight Python web framework for building web applications
 # Flask is a micro-framework, which means it does not include a lot of features
@@ -9,7 +10,7 @@ from models import db
 # Database = "sqlite:///recap.db"
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///recap.db"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 migrate = Migrate(app, db)
 db.init_app(app)

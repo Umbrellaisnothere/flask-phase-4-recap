@@ -18,17 +18,13 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
 
     posts = db.relationship("Post", back_populates="user")
+    groups = db.relationship("Group", secondary=user_groups, back_populates="users")
     # comments = db.relationship("Comment", back_populates="user")
 
     @validates("email")
     def validate_email(self, key, email):
-        if "@" not in email:
-            raise ValueError("'@' must be a valid email address")
-        return email
-    @validates("email")
-    def validate_email_dot(self, key, email):
-        if "." not in email:
-            raise ValueError("'.' must be a valid email address")
+        if "@" not in email or "." not in email:
+            raise ValueError("Email must contain both '@' and '.' to be valid")
         return email
 
 
@@ -50,6 +46,7 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
 
+    users = db.relationship("User", secondary=user_groups, back_populates="groups")
 
 
 # class Comment(db.Model):
