@@ -4,6 +4,7 @@ from models import db, User, Post, Group, user_groups
 from flask_sqlalchemy import SQLAlchemy
 from flask import make_response, request
 from flask import jsonify
+from flask_cors import CORS
 
 # Flask is a lightweight Python web framework for building web applications
 # Flask is a micro-framework, which means it does not include a lot of features
@@ -16,6 +17,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 migrate = Migrate(app, db)
 db.init_app(app)
+CORS(app)
+# api = API(app)
+
+# app.register_blueprint(bp_post, url_prefix="/posts")
+# app.register_blueprint(bp_user, url_prefix="/users")
 
 
 @app.route("/")

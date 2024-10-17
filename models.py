@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import  validates
 from sqlalchemy_serializer import SerializerMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 db = SQLAlchemy()
@@ -19,6 +20,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(100), nullable=False)
 
     posts = db.relationship("Post", back_populates="user")
     groups = db.relationship("Group", secondary=user_groups, back_populates="users")
@@ -30,6 +32,11 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Email must contain both '@' and '.' to be valid")
         return email
 
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
 class Post(db.Model, SerializerMixin):
     __tablename__ = "posts"
